@@ -1,0 +1,78 @@
+
+COPYGB: A utility for copying and/or interpolating part
+        or all of the contents of a file in GRIB1 
+        format to another file in GRIB1 format
+
+
+-------------------------------------------------------
+BUILDING COPYGB
+-------------------------------------------------------
+To build copygb, type
+
+  ./configure
+
+and select the option for your particular machine. After configuring, type
+
+  ./compile
+
+to build the code.
+
+To clean an old build (for example, after modifying source code), use
+
+  ./clean -a
+
+If the build is successful, the executable "copygb.exe" will be found in 
+the bin/ directory
+
+-------------------------------------------------------
+RUNNING COPYGB
+-------------------------------------------------------
+Copygb
+ • Interpolates the forecasts horizontally from their native grid to a standard AWIPS or user-defined
+   grid (for information on AWIPS grids, see http://www.nco.ncep.noaa.gov/pmb/docs/on388/tableb.html).
+ • Outputs the results in NWS and WMO standard GRIB1 format (for GRIB documentation, see
+   http://www.nco.ncep.noaa.gov/pmb/docs/).
+
+
+Sample command line for calling copygb:
+
+  copygb.exe -xg"grid [kgds]" input_file output_file
+
+where grid refers to the output grid to which the native forecast is being interpolated.
+
+The output grid can be specified in three ways:
+
+1. As the grid id of a pre-defined AWIPS grid number (gridno):
+   copygb.exe -g${gridno} -x input_file output_file
+
+   For example, using grid 218:
+   copygb.exe -xg"218" WRFPRS_$domain.${fhr} wrfprs_$domain .${fhr}
+
+2. As a user defined standard grid, such as for grid 255:
+   copygb.exe -xg"255 kgds" input_file output_file
+
+   where the user defined grid is specified by a full set of kgds parameters determining a GRIB GDS
+   (grid description section) in the W3fi63 format. Details on how to specify the kgds parameters are
+   documented in file lib/w3lib/w3fi71.f . For example:
+   copygb.exe -xg" 255 3 109 91 37719 -77645 8 -71000 10433 9966 0 64 42000 42000" WRFPRS_$domain.${fhr} wrfprs_$domain.${fhr}
+
+3. From a file: When WRF-ARW output is processed by unipost, a text file, copygb_hwrf.txt, is
+   created. This file contain the GRID GDS of a lat/lon grid similar in domain and grid spacing to the
+   one used to run the WRF-ARW model. The contents of this file can be read into the variable "nav"
+   and can be used as input to copygb.exe.
+   copygb.exe -xg"$nav" input_file output_file
+
+   For example, when using copygb_hwrf.txt for an application, the steps include:
+   read nav < 'copygb_hwrf.txt'
+   export nav
+   copygb.exe -xg"${nav}" WRFPRS_$domain.${fhr}
+   wrfprs_$domain.${fhr}
+
+It should be noted that copygb is a flexible program that can accept several command line options specifying
+details of how the horizontal interpolation from the native grid to the output grid should be performed.
+Complete documentation of copygb can be found at:
+
+http://www.dtcenter.org/met/users/support/online_tutorial/METv5.0/copygb/copygb.txt
+
+
+
